@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# Output file
+output_file="system_info.txt"
+
+# Function to print a separator line in the output file
+print_separator() {
+    echo "----------------------------------------" >> "$output_file"
+}
+
+# Get system hostname
+hostname=$(hostname)
+
+# Get operating system
+os=$(cat /etc/os-release | grep PRETTY_NAME | cut -d'"' -f2)
+
+# Get system uptime
+uptime=$(uptime -p)
+
+# Get Linux kernel version
+kernel_version=$(uname -r)
+
+# Get general CPU information (excluding Flags and Vulnerabilities sections for clutter)
+cpu_info=$(lscpu | grep -v -e "Flags" -e "Vulnerability ")
+
+# Get memory information
+memory_info=$(free -h)
+
+# Get IP information for all network interfaces
+ip_info=$(ip addr)
+
+# Get filesystem utilization
+filesystem_info=$(df -h)
+
+# Get last five lines of the general log file containing the word "error" (case-insensitive)
+log_errors=$(grep -i "error" /var/log/syslog | tail -n 5)
+
+# Write information to the output file
+echo "System Information" > "$output_file"
+print_separator
+echo "Hostname: $hostname" >> "$output_file"
+echo "Operating System: $os" >> "$output_file"
+echo "Uptime: $uptime" >> "$output_file"
+echo "Kernel Version: $kernel_version" >> "$output_file"
+print_separator
+echo "CPU Information (excluding Flags and Vulnerabilities):" >> "$output_file"
+echo "$cpu_info" >> "$output_file"
+print_separator
+echo "Memory Information:" >> "$output_file"
+echo "$memory_info" >> "$output_file"
+print_separator
+echo "IP Information:" >> "$output_file"
+echo "$ip_info" >> "$output_file"
+print_separator
+echo "Filesystem Utilization:" >> "$output_file"
+echo "$filesystem_info" >> "$output_file"
+print_separator
+echo "Last Five Lines of Log File Containing 'error':" >> "$output_file"
+echo "$log_errors" >> "$output_file"
+
+# Print a completion message
+echo "System information gathered and saved to $output_file.
+echo "Execute command 'cat $output_file | less' to view results."
+
